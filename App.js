@@ -1,146 +1,177 @@
-import React from 'react'
-import { Platform, StyleSheet, Text, TextInput, View,KeyboardAvoidingView,TouchableOpacity, ScrollView} from 'react-native'
-import { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  ScrollView,
+  View,
+  TextInput,
+  Button,
+  TouchableOpacity,
+  Image
+} from 'react-native';
+
+import {
+  useState
+} from 'react';
 
 import Header from './Components/Header';
-import Todo from './Components/Todo';
-// import SubTitle from './Components/SubTitle';
+// import Insert from './Components/Insert';
+// import List from './Components/List';
+//import Items from './Components/Items';
+
+import Circle from './assets/circle.png'
+import Delete from './assets/delete.png'
+
+const styles = StyleSheet.create({
+
+  mainView : {
+    flex : 1,
+    height : "100%",
+    marginTop : 50,
+    alignItems : 'center'
+  },
+  mainText : {
+    fontSize : 20,
+    color : 'black',
+    fontWeight : 'bold',
+    padding:20,
+    margin : 20,
+    backgroundColor : 'orange',
+  },
+  input : {
+    flex: 1,
+    padding: 20,
+    borderBottomColor: '#bbb',
+    borderBottomWidth: 1,
+    fontSize: 24,
+    marginLeft: 20,
+  },
+  card: {
+    backgroundColor: '#fff',
+    flex: 1,
+    borderTopLeftRadius: 10, 
+    borderTopRightRadius: 10, // 모서리 둥글게
+    marginLeft: 10,
+    marginRight: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  button: {
+    marginRight: 10,
+  },
+  itemsView: {
+      flex: 1,
+      borderBottomColor: '#bbb',
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+
+  text: {
+    flex: 5,
+    fontWeight: '500',
+    fontSize: 18,
+    marginVertical: 20,
+    width: 100,
+  },
+
+  //원 포인트
+  circle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderColor: 'black',
+    borderWidth: 2,
+    marginRight: 20,
+    marginLeft: 20,
+  },
+  //리스트 완료시 원 변화
+  completeCircle: {
+    marginRight: 20,
+    marginLeft: 20,
+  },
+  //할일 완료시 줄 그어짐
+  TextLine: {
+    color: '#bbb',
+    textDecorationLine: 'line-through',
+  },
+  //할일 끝나면 색 변화
+    TextLinecolor: {
+    color: '#29323c',
+  },
+  buttonContainer: {
+    // marginVertical: 10,
+    // marginHorizontal: 10,
+  },
+})
+
 function App () {
 
   const [appName, setAppName] = useState("ToDoList");
+  const [myTextInput, setMyTextInput] = useState('')
+  const [alphabet, setAlphabet] = useState ([])
 
-  //할일 넣기
-  const [todo, setTodo] = useState();
-  //할일을 리스트로 설정해서 넣기
-  const [todoItems, setTodoItems] = useState([]);
-
-  //텍스트 추가
-  const addTodo = () =>{
-    // console.log(todo); //시험
-    setTodoItems([...todoItems, todo])
-    setTodo(null);
+  const onChangeInput = (event) =>{
+    console.log("event", event)
+    setMyTextInput(event)
   }
 
-  //TodoList 터치시 삭제
-  const completeList = (index) => {
-    //지역변수 설정해서 리스트를 복사하여 인덱스 번호 삽입
-    let itemsCopy = [...todoItems];
-    itemsCopy.splice(index, 1); //splice() 메서드는 배열의 기존 요소를 삭제 또는 교체하거나 새 요소를 추가하여 배열의 내용을 변경합니다.
-    setTodoItems(itemsCopy);
+  const onAddTextInput = () =>{
+    setAlphabet([...alphabet, myTextInput])
+    setMyTextInput('');
   }
-    return (
-      // main
-      <View style = {styles.container}>
 
-        {/* ToDoList Header */}
+  const onRemoveItem = (index) => {
+    // 해당 index의 항목을 alphabet 배열에서 삭제
+    const updatedAlphabet = alphabet.filter((item, idx) => idx !== index);
+    setAlphabet(updatedAlphabet);
+  };
+
+  return (
+    <View style = {styles.mainView}>
       <Header name = {appName}></Header>
-
-        {/* Today todo */}
-        <ScrollView>
-        <View style = {styles.todoWrapper}>
-            <Text style = {styles.sectionTitle}>Today's Todo </Text>
-
-          <View style = {styles.Item}>
-            {/* Todo's List */}
-            <TouchableOpacity onPress = {() => alert('1.input text & press "+"\n2.Touch the list if you complete')}>
-              <Todo text = {'Touch Me!'}/>
-            </TouchableOpacity>
-              
-            {
-            //todolist 리스트 map 설정
-            todoItems.map((item, index) => {
-              return(
-                <TouchableOpacity key = {index} onPress = {() => completeList(alert('Did It!'))}>
-                  <Todo text = {item}/>
-                </TouchableOpacity>
-                )
-              })
-            }
+      <ScrollView style = {{width: "100%"}}>
+      <View style={styles.card}>
+      <TextInput 
+          style = {styles.input}
+          placeholder="Input Your Schedule"
+          placeholderTextColor={'#999'}
+          onChangeText={onChangeInput}
+          value={myTextInput}
+          autoCorrect={false} // 밑줄
+          multiline = {true} //텍스트 맨 위 정렬
+          editable = {true} //텍스트 편집 안됨
+        ></TextInput>
+          <Button 
+          style = {styles.button}
+          title="add"
+          onPress={onAddTextInput}/>
           </View>
-        </View>
-        </ScrollView>
-
-        {/* ToDoList write part */}
-          {/* What is KeyboardAvoidingView => 이 컴포넌트는 가상 키보드가 표시되는 동안 키보드 높이를 기준으로 높이, 위치 또는 하단 패딩을 자동으로 조정합니다. */}
-          <KeyboardAvoidingView
-          //삼항 연산으로 운영 체제에 따라 자동 조정
-            behavior = {Platform.OS === "ios" ? "padding" : "heigth"}
-            style = {styles.writeToDoWrapper}
-            >
-              {/* 텍스트 인풋 */}
-              <TextInput style = {styles.input}
-              placeholder = {'Write Your TodoList'} value = {todo} onChangeText = {text => setTodo(text)}>
-              </TextInput>
-
-              {/* Add ToDoList */}
-              <TouchableOpacity onPress = {() => addTodo()}>
-                <View style = {styles.addWrapper}>
-                  <Text style = {styles.addText}>+</Text>
+           <View style={styles.itemsView}>
+              <TouchableOpacity>
+                <View style={styles.completeCircle}>
+                  <Image style = {{width : 50 , height : 50}} name="circle" source = {Circle} color="#3143e8" />
                 </View>
               </TouchableOpacity>
-            </KeyboardAvoidingView>
-      </View>
-    )
+                <Text style={styles.text}>작업중</Text>
+              <TouchableOpacity style={styles.buttonContainer}>
+                <Text style={styles.buttonText}>
+                  <Image style={{width : 50 , height : 50}} name ="delete"  source = {Delete} color="#e33057" />
+                </Text>
+              </TouchableOpacity>
+            </View>
+            {alphabet.map((item, idx) => (
+          <TouchableOpacity
+            key={idx}
+            onPress={() => onRemoveItem(idx)} // 항목 터치 시 삭제 함수 호출
+          >
+            <Text style={styles.mainText}>{item}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>    
+    </View>
+  );
 }
-
-const styles = StyleSheet.create({
-  container: {
-		flex: 1,
-    backgroundColor : '#E8EAED'
-  },
-  //메인 헤더와 서브 타이틀간의 간격
-  todoWrapper: {
-    paddingTop : 10,
-    paddingHorizontal : 10,
-  },
-  //서브 타이틀
-  sectionTitle: {
-   fontSize : 24,
-   fontWeight : 'bold',
-  },
-  //ToDoList들
-  Item : {
-    marginTop : 30, //아이템 텍스트 들과 서브 타이틀간의 거리
-  },
-  //인풋 텍스트와 추가 버튼
-  writeToDoWrapper:{
-    position : 'absolute',
-    bottom : 60,
-    width : '100%',
-    flexDirection : 'row',
-    justifyContent : 'space-between',
-    alignItems : 'center',
-  },
-  input:{
-    paddingVertical : 15, //텍스트와 인풋 간격 크기
-    paddingHorizontal : 15, //텍스트와 프레스 홀더 위치
-    width : 250,
-    backgroundColor : '#FFF',
-    borderColor : '#C0C0C0', //겉 테두리 색
-    borderRadius : 60,
-    borderWidth : 1,
-
-  },
-  //텍스트 추가 버튼
-  addWrapper:{
-    width : 50,
-    heigth : 10,
-    backgroundColor : '#FFF',
-    borderRadius : 50,
-    justifyContent : 'center',
-    alignItems : 'center',
-    borderColor : '#FFF',
-    borderWidth : 10,
-  },
-  //텍스트 글자
-  addText:{
-    fontSize:20,
-  },
-  //텍스트 체크
-  checkedTodoList:{
-    color : 'gray',
-    textDecorationLine: 'line-through',
-  }
-})
 
 export default App;
